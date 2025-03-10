@@ -8,13 +8,11 @@ pipeline {
         dockerTool 'docker'
     }
     environment {
-        DOCKER_BIN = tool 'docker'
-        
+        DOCKER_BIN = tool 'docker'      
         DOCKER_HOST="tcp://host.docker.internal:2375"
         IMAGE_NAME="hello-python"
         PATH = "/home/jenkins/tools/org.jenkinsci.plugins.docker.commons.tools.DockerTool/docker/docker:${env.PATH}"
         DOCKER_CREDENTIALS_ID = "fe9f411c-2291-41e0-92e3-450f19b3cbbb"
-        DOCKER_HUB_REPO = "vassa306/$IMAGE_NAME"
     }
     stages {
         stage('Build') {
@@ -72,15 +70,14 @@ pipeline {
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )]) {
-                        echo "Logging in to Docker Hub..."
-                        sh '''
+                        sh """
                             echo 'Logging in to Docker Hub...'
-                            echo "pushing to docker hub"
-                            docker push $dockerRepo:latest || {
-                                echo "Docker push failed"
+                            echo 'Pushing to Docker Hub...'
+                            docker push ${dockerRepo}:latest || {
+                                echo 'Docker push failed'
                                 exit 1
                             }
-                        '''
+                        """
                     }
                 }
             }
