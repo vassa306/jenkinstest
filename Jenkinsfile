@@ -72,7 +72,12 @@ pipeline {
                     )]) {
                         echo "Logging in to Docker Hub..."
                         sh '''
-                            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                            echo 'Logging in to Docker Hub...'
+                            echo "pushing to docker hub"
+                            docker push $IMAGE_NAME || {
+                                echo "Docker push failed"
+                                exit 1
+                            }
                         '''
                     }
                 }
