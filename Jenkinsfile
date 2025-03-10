@@ -38,12 +38,13 @@ pipeline {
             steps {
                 echo "Testing.."
                 sh '''
-                echo "Running containers:"
-                docker ps
+                echo "Running containers:" 
 
-                echo "Checking if our image is running..."
-                docker ps | grep '${env.IMAGE_NAME}:${tag}'
-                '''
+                echo "Checking if our image is present in the list of images"
+                docker images | grep '${env.IMAGE_NAME}:${TAG_NAME}' || {
+                    echo "Image not found"
+                    exit 1
+                }    
             }
         }
 
