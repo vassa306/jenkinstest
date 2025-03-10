@@ -9,7 +9,10 @@ pipeline {
     }
     environment {
         DOCKER_BIN = tool 'docker'
-        PATH = "${DOCKER_BIN}:${env.PATH}"
+        
+        DOCKER_HOST="tcp://host.docker.internal:2375"
+        IMAGE_NAME="hello-python"
+        PATH = "/home/jenkins/tools/org.jenkinsci.plugins.docker.commons.tools.DockerTool/docker/docker:${env.PATH}"
     }
     stages {
         stage('Build') {
@@ -19,26 +22,15 @@ pipeline {
                     echo "Building.."
                 }
                 sh '''
+                    image_name="hello-python"
                     echo "Using docker from: $(which docker)"
                     echo "Doing build stuff..."
-                
-                    export DOCKER_HOST=tcp://host.docker.internal:2375
-
-                    echo "Docker version:"
-                    docker --version || {
-                        echo Docker binary not found or not executable."
-                        exit 1
-                    }
-
-                    echo "Full Docker info:"
-                    docker info || {
-                        echo "Docker daemon is not reachable at $DOCKER_HOST"
-                        exit 1
-                    }
-
-                    echo "Running docker ps:"
-                    docker ps -a || {
-                        echo "docker ps failed – check if Docker daemon is working properly."
+                    echo $PATH
+                    echo $DOCKER_HOST
+                   
+                    echo "Building Docker image '$image_name'..."
+                    docker build -t $IMAGE_NAME . || {
+                        echo "Docker build failed"
                         exit 1
                     }
 
