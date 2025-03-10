@@ -54,7 +54,7 @@ pipeline {
                     echo "running docker container"
                     echo "Pushing Docker image '$IMAGE_NAME'..."
                     docker rm -f test || true
-                    docker run -d --name test $IMAGE_NAME || {
+                    docker run -d --name test $IMAGE_NAME:$TAG_NAME || {
                         echo "Docker is running successfully"
                         exit 1
                     }
