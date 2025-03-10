@@ -53,6 +53,7 @@ pipeline {
                 sh '''
                     echo "Doing deliver stuff..."
                     echo "Pushing Docker image '$IMAGE_NAME'..."
+                    docker rm -f test || true
                     docker run -d --name test $IMAGE_NAME || {
                         echo "Docker push failed"
                         exit 1
