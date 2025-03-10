@@ -37,13 +37,13 @@ pipeline {
         stage('Test') {
             steps {
                 echo "Testing.."
-                sh """
+                sh '''
                 echo "Running containers:"
                 docker ps
 
                 echo "Checking if our image is running..."
                 docker ps | grep '${env.IMAGE_NAME}:${tag}'
-            """
+                '''
             }
         }
 
