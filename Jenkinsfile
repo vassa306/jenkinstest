@@ -44,6 +44,7 @@ pipeline {
                 docker images | grep '${env.IMAGE_NAME}:${TAG_NAME}' || {
                     echo "Image not found"
                     exit 1
+                '''
                 }    
             }
         }
