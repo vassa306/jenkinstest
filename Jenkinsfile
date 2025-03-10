@@ -49,7 +49,15 @@ pipeline {
         stage('Deliver') {
             steps {
                 echo "Delivering.."
-                sh 'echo "Doing delivery stuff..."'
+                sh '''
+                    echo "Doing deliver stuff..."
+                    echo "Pushing Docker image '$IMAGE_NAME'..."
+                    docker run -d --name test $IMAGE_NAME || {
+                        echo "Docker push failed"
+                        exit 1
+                    }
+                    echo "Docker image pushed successfully."
+                '''
             }
         }
     }
