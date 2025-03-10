@@ -51,14 +51,14 @@ pipeline {
             steps {
                 echo "Delivering.."
                 sh '''
-                    echo "Doing deliver stuff..."
+                    echo "running docker container"
                     echo "Pushing Docker image '$IMAGE_NAME'..."
                     docker rm -f test || true
                     docker run -d --name test $IMAGE_NAME || {
-                        echo "Docker push failed"
+                        echo "Docker is running successfully"
                         exit 1
                     }
-                    echo "Docker image pushed successfully."
+                    echo "Docker contaier is running successfully."
                 '''
             }
         }
