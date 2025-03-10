@@ -14,6 +14,7 @@ pipeline {
         IMAGE_NAME="hello-python"
         PATH = "/home/jenkins/tools/org.jenkinsci.plugins.docker.commons.tools.DockerTool/docker/docker:${env.PATH}"
         DOCKER_CREDENTIALS_ID = "fe9f411c-2291-41e0-92e3-450f19b3cbbb"
+        DOCKER_HUB_REPO = "vassa306/$IMAGE_NAME"
     }
     stages {
         stage('Build') {
@@ -65,6 +66,7 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 script {
+                    def dockerRepo = "vassa306/${env.IMAGE_NAME}"
                     withCredentials([usernamePassword(
                         credentialsId: DOCKER_CREDENTIALS_ID,
                         usernameVariable: 'DOCKER_USER',
@@ -74,7 +76,7 @@ pipeline {
                         sh '''
                             echo 'Logging in to Docker Hub...'
                             echo "pushing to docker hub"
-                            docker push $IMAGE_NAME || {
+                            docker push $dockerRepo:latest || {
                                 echo "Docker push failed"
                                 exit 1
                             }
