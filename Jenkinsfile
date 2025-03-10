@@ -47,7 +47,7 @@ pipeline {
             }
         }
 
-        stage('Deliver') {
+        stage('creating and running container') {
             steps {
                 echo "Delivering.."
                 sh '''
