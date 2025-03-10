@@ -1,0 +1,64 @@
+pipeline {
+    agent {
+        node {
+            label 'docker-agent-alpine'
+        }
+    }
+    tools {
+        dockerTool 'docker'
+    }
+    environment {
+        DOCKER_BIN = tool 'docker'
+        PATH = "${DOCKER_BIN}:${env.PATH}"
+    }
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    echo "Build Name: ${env.JOB_NAME}, Build ID: ${env.BUILD_ID}"
+                    echo "Building.."
+                }
+                sh '''
+                    echo "Using docker from: $(which docker)"
+                    echo "Doing build stuff..."
+                
+                    export DOCKER_HOST=tcp://host.docker.internal:2375
+
+                    echo "Docker version:"
+                    docker --version || {
+                        echo Docker binary not found or not executable."
+                        exit 1
+                    }
+
+                    echo "Full Docker info:"
+                    docker info || {
+                        echo "Docker daemon is not reachable at $DOCKER_HOST"
+                        exit 1
+                    }
+
+                    echo "Running docker ps:"
+                    docker ps -a || {
+                        echo "docker ps failed – check if Docker daemon is working properly."
+                        exit 1
+                    }
+
+                    echo "Docker image built successfully."
+                '''
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Testing.."
+                sh 'echo "Doing test stuff..."'
+            }
+        }
+
+        stage('Deliver') {
+            steps {
+                echo "Delivering.."
+                sh 'echo "Doing delivery stuff..."'
+            }
+        }
+    }
+}
