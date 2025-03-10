@@ -1,14 +1,17 @@
 pipeline {
-    agent { 
+    agent {
         node {
             label 'docker-agent-alpine'
         }
     }
     tools {
-        dockerTool 'docker'  // Musí odpovídat názvu v tool konfiguraci
+        dockerTool 'docker'
     }
     environment {
         DOCKER_BIN = tool 'docker'
+        
+        DOCKER_HOST="tcp://host.docker.internal:2375"
+        IMAGE_NAME="hello-python"
         PATH = "/home/jenkins/tools/org.jenkinsci.plugins.docker.commons.tools.DockerTool/docker/docker:${env.PATH}"
     }
     stages {
@@ -19,43 +22,34 @@ pipeline {
                     echo "Building.."
                 }
                 sh '''
-                    echo "doing build stuff.."
-                    java --version
-                    DOCKER_HOST="tcp://host.docker.internal:2375"
-                    echo "PATH: $PATH"
-                    chmod +x /home/jenkins/tools/org.jenkinsci.plugins.docker.commons.tools.DockerTool/docker/docker
-
-                    echo "Checking Docker version..."
-                    /home/jenkins/tools/org.jenkinsci.plugins.docker.commons.tools.DockerTool/docker/docker/docker --version || {
-                        echo "Docker binary not found or not executable."
+                    image_name="hello-python"
+                    echo "Using docker from: $(which docker)"
+                    echo "Doing build stuff..."
+                    echo $PATH
+                    echo $DOCKER_HOST
+                   
+                    echo "Building Docker image '$image_name'..."
+                    docker build -t $IMAGE_NAME . || {
+                        echo "Docker build failed"
                         exit 1
                     }
 
-                    echo "Running docker ps..."
-                    /home/jenkins/tools/org.jenkinsci.plugins.docker.commons.tools.DockerTool/docker/docker/docker ps -a || {
-                        echo "docker ps' failed – check if Docker daemon is working properly."
-                        exit 1
-                    }
-
-                    echo "Docker is working correctly."
+                    echo "Docker image built successfully."
                 '''
             }
         }
+
         stage('Test') {
             steps {
                 echo "Testing.."
-                sh '''
-                    echo "doing test stuff.."
-                '''
+                sh 'echo "Doing test stuff..."'
             }
         }
+
         stage('Deliver') {
             steps {
-                echo "Build Name: ${env.JOB_NAME}, Build ID: ${env.BUILD_ID}"
                 echo "Delivering.."
-                sh '''
-                    echo "doing delivery stuff.."
-                '''
+                sh 'echo "Doing delivery stuff..."'
             }
         }
     }
