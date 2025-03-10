@@ -23,12 +23,6 @@ pipeline {
                     echo "Building.."
                 }
                 sh '''
-                    image_name="hello-python"
-                    echo "Using docker from: $(which docker)"
-                    echo "Doing build stuff..."
-                    echo $PATH
-                    echo $DOCKER_HOST
-                   
                     echo "Building Docker image '$image_name'..."
                     docker build -t $IMAGE_NAME:$TAG_NAME . || {
                         echo "Docker build failed"
@@ -43,7 +37,13 @@ pipeline {
         stage('Test') {
             steps {
                 echo "Testing.."
-                sh 'echo "Doing test stuff..."'
+                sh """
+                echo "Running containers:"
+                docker ps
+
+                echo "Checking if our image is running..."
+                docker ps | grep '${env.IMAGE_NAME}:${tag}'
+            """
             }
         }
 
