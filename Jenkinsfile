@@ -13,6 +13,7 @@ pipeline {
         DOCKER_HOST="tcp://host.docker.internal:2375"
         IMAGE_NAME="hello-python"
         PATH = "/home/jenkins/tools/org.jenkinsci.plugins.docker.commons.tools.DockerTool/docker/docker:${env.PATH}"
+        DOCKER_CREDENTIALS_ID = "fe9f411c-2291-41e0-92e3-450f19b3cbbb"
     }
     stages {
         stage('Build') {
@@ -58,6 +59,15 @@ pipeline {
                     }
                     echo "Docker image pushed successfully."
                 '''
+            }
+        }
+        stage('Login to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS_ID,
+                                                    usernameVariable: 'USERNAME',
+                                                    passwordVariable: 'PASSWORD')]) {
+                    sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                }
             }
         }
     }
