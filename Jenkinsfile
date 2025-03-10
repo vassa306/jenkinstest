@@ -10,7 +10,7 @@ pipeline {
     environment {
         DOCKER_BIN = tool 'docker'      
         DOCKER_HOST="tcp://host.docker.internal:2375"
-        IMAGE_NAME="hello-python"
+        IMAGE_NAME="vassa306/hello-python"
         PATH = "/home/jenkins/tools/org.jenkinsci.plugins.docker.commons.tools.DockerTool/docker/docker:${env.PATH}"
         DOCKER_CREDENTIALS_ID = "fe9f411c-2291-41e0-92e3-450f19b3cbbb"
         TAG_NAME = "${BUILD_NUMBER}"
@@ -65,7 +65,7 @@ pipeline {
         stage('Login & Push to Docker Hub') {
             steps {
                 script {
-                    def dockerRepo = "vassa306/${env.IMAGE_NAME}"
+                    def dockerRepo = "${env.IMAGE_NAME}"
                     withCredentials([usernamePassword(
                         credentialsId: DOCKER_CREDENTIALS_ID,
                         usernameVariable: 'DOCKER_USER',
@@ -74,9 +74,6 @@ pipeline {
                         sh """
                             echo 'Pushing image: ${dockerRepo}:${env.TAG_NAME}'
                             docker push ${dockerRepo}:${env.TAG_NAME}
-
-                            echo 'Also pushing latest tag'
-                            docker push ${dockerRepo}:latest
                         """
                     }
                 }
