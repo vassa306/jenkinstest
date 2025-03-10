@@ -13,6 +13,7 @@ pipeline {
         IMAGE_NAME="hello-python"
         PATH = "/home/jenkins/tools/org.jenkinsci.plugins.docker.commons.tools.DockerTool/docker/docker:${env.PATH}"
         DOCKER_CREDENTIALS_ID = "fe9f411c-2291-41e0-92e3-450f19b3cbbb"
+        TAG_NAME = "${BUILD_NUMBER}"
     }
     stages {
         stage('Build') {
@@ -29,7 +30,7 @@ pipeline {
                     echo $DOCKER_HOST
                    
                     echo "Building Docker image '$image_name'..."
-                    docker build -t $IMAGE_NAME . || {
+                    docker build -t $IMAGE_NAME:$TAG_NAME . || {
                         echo "Docker build failed"
                         exit 1
                     }
@@ -61,7 +62,7 @@ pipeline {
                 '''
             }
         }
-        stage('Login to Docker Hub') {
+        stage('Login & Push to Docker Hub') {
             steps {
                 script {
                     def dockerRepo = "vassa306/${env.IMAGE_NAME}"
@@ -71,12 +72,11 @@ pipeline {
                         passwordVariable: 'DOCKER_PASS'
                     )]) {
                         sh """
-                            echo 'Logging in to Docker Hub...'
-                            echo 'Pushing to Docker Hub...'
-                            docker push ${dockerRepo}:latest || {
-                                echo 'Docker push failed'
-                                exit 1
-                            }
+                            echo 'Pushing image: ${dockerRepo}:${env.TAG_NAME}'
+                            docker push ${dockerRepo}:${env.TAG_NAME}
+
+                            echo 'Also pushing latest tag'
+                            docker push ${dockerRepo}:latest
                         """
                     }
                 }
