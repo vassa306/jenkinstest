@@ -34,20 +34,7 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                echo "Testing.."
-                sh '''
-                echo "Running containers:" 
-
-                echo "Checking if our image is present in the list of images"
-                docker images | grep '${TAG_NAME}' || {
-                    echo "Image not found"
-                    exit 1
-                    }
-                '''   
-            }
-        }
+        
 
         stage('creating and running container') {
             steps {
@@ -64,6 +51,23 @@ pipeline {
                 '''
             }
         }
+
+
+        stage('Test') {
+            steps {
+                echo "Testing.."
+                sh '''
+                echo "Running containers:" 
+
+                echo "Checking if our image is present in the list of images"
+                docker ps | grep 'test' || {
+                    echo "Image not found"
+                    exit 1
+                    }
+                '''   
+            }
+        }
+
         stage('Login & Push to Docker Hub') {
             steps {
                 script {
