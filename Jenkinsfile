@@ -89,9 +89,11 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    echo "🧹 Cleaning up Docker images related to vassa306..."
+                    echo "Cleaning up Docker images related to vassa306..."
 
                     sh """
+                        echo "Logging out from Docker Hub..."
+                        docker logout
                         docker images --format "{{.Repository}}:{{.Tag}}" | grep vassa306 || true
                         docker images --format "{{.Repository}}:{{.Tag}}" | grep vassa306 | xargs -r docker rmi || true
                     """
