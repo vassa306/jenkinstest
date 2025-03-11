@@ -41,7 +41,7 @@ pipeline {
                 echo "Running containers:" 
 
                 echo "Checking if our image is present in the list of images"
-                docker images | grep '${env.IMAGE_NAME}:${TAG_NAME}' || {
+                docker images | grep '${TAG_NAME}' || {
                     echo "Image not found"
                     exit 1
                     }
@@ -79,6 +79,18 @@ pipeline {
                             docker push ${dockerRepo}:${env.TAG_NAME}
                         """
                     }
+                }
+            }
+        }
+        stage('Cleanup') {
+            steps {
+                script {
+                    echo "🧹 Cleaning up Docker images related to vassa306..."
+
+                    sh """
+                        docker images --format "{{.Repository}}:{{.Tag}}" | grep vassa306 || true
+                        docker images --format "{{.Repository}}:{{.Tag}}" | grep vassa306 | xargs -r docker rmi || true
+                    """
                 }
             }
         }
