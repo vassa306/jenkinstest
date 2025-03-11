@@ -53,20 +53,20 @@ pipeline {
         }
 
 
-        // stage('Test') {
-        //     steps {
-        //         echo "Testing.."
-        //         sh '''
-        //         echo "Running containers:" 
+        stage('Test') {
+            steps {
+                echo "Testing.."
+                sh '''
+                echo "Running containers:" 
 
-        //         echo "Checking if our image is present in the list of images"
-        //         docker ps | grep 'test' || {
-        //             echo "Image not found"
-        //             exit 1
-        //             }
-        //         '''   
-        //     }
-        // }
+                echo "Checking if our image is present in the list of images"
+                docker images --format "{{.Repository}}:{{.Tag}}" | grep vassa306 || {
+                    echo "Image not found"
+                    exit 1
+                    }
+                '''   
+            }
+        }
 
         stage('Login & Push to Docker Hub') {
             steps {
